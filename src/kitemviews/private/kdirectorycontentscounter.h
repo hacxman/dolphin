@@ -73,8 +73,8 @@ private:
     KFileItemModel* m_model;
 
     // Used as FIFO queues.
-    QLinkedList<QString> m_priorityQueue;
-    QLinkedList<QString> m_queue;
+    std::list<QString> m_priorityQueue;
+    std::list<QString> m_queue;
 
     static QThread* m_workerThread;
 
