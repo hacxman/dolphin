@@ -138,6 +138,15 @@ void DolphinSearchBoxTest::testBalooSearchParsing_data()
     QTest::newRow("allTerms/space")
         << balooQueryUrl(textS + " " + filenameS + " " + rating + " AND " + modified + " AND " + tagS)
         << textS + " " + filenameS << QStringList({modified, rating, tagR}) << true << true;
+
+    // Test tags:/ URL scheme
+    const std::function<QUrl(QString)>        tagUrl   = [](const QString &tag) { return QUrl(QStringLiteral("tags:/%1/").arg(tag)); };
+    const std::function<QStringList(QString)> tagTerms = [](const QString &tag) { return QStringList{QStringLiteral("tag:%1").arg(tag)}; };
+
+    QTest::newRow("tagsUrl")       << tagUrl("tagA")             << "" << tagTerms("tagA")             << false << false;
+    QTest::newRow("tagsUrl/space") << tagUrl("tagB with spaces") << "" << tagTerms("tagB with spaces") << false << false;
+    QTest::newRow("tagsUrl/hash")  << tagUrl("tagC#hash")        << "" << tagTerms("tagC#hash")        << false << false;
+    QTest::newRow("tagsUrl/slash") << tagUrl("tagD/with/slash")  << "" << tagTerms("tagD/with/slash")  << false << false;
 }
 
 /**
