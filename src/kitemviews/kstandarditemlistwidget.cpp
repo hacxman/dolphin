@@ -1300,7 +1300,7 @@ void KStandardItemListWidget::updateCompactLayoutTextCache()
         y += lineSpacing;
     }
 
-    m_textRect = QRectF(x - 2 * option.padding, 0, maximumRequiredTextWidth + 3 * option.padding, widgetHeight);
+    m_textRect = QRectF(x - option.padding, 0, maximumRequiredTextWidth + 2 * option.padding, widgetHeight);
 }
 
 void KStandardItemListWidget::updateDetailsLayoutTextCache()
@@ -1358,8 +1358,8 @@ void KStandardItemListWidget::updateDetailsLayoutTextCache()
             const qreal textWidth = option.extendedSelectionRegion
                                     ? size().width() - textInfo->pos.x()
                                     : requiredWidth + 2 * option.padding;
-            m_textRect = QRectF(textInfo->pos.x() - 2 * option.padding, 0,
-                                textWidth + option.padding, size().height());
+            m_textRect = QRectF(textInfo->pos.x() - option.padding, 0,
+                                textWidth, size().height());
 
             // The column after the name should always be aligned on the same x-position independent
             // from the expansion-level shown in the name column
