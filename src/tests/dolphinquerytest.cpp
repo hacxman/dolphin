@@ -153,7 +153,7 @@ void DolphinSearchBoxTest::testBalooSearchParsing()
     QFETCH(bool, hasFileName);
 
     const QUrl testUrl = composeQueryUrl(searchString);
-    const DolphinQuery query = DolphinQuery::fromBalooSearchUrl(testUrl);
+    const DolphinQuery query = DolphinQuery::fromSearchUrl(testUrl);
 
     QStringList searchTerms = query.searchTerms();
     searchTerms.sort();

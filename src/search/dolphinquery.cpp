@@ -69,18 +69,38 @@ namespace {
     }
 }
 
-DolphinQuery DolphinQuery::fromBalooSearchUrl(const QUrl& searchUrl)
+
+DolphinQuery DolphinQuery::fromSearchUrl(const QUrl& searchUrl)
 {
     DolphinQuery model;
     model.m_searchUrl = searchUrl;
 
+    if (searchUrl.scheme() == QLatin1String("baloosearch")) {
 #ifdef HAVE_BALOO
-    const Baloo::Query query = Baloo::Query::fromSearchUrl(searchUrl);
+        model.parseBalooQuery();
+#endif
+    }
 
-    model.m_includeFolder = query.includeFolder();
+    return model;
+}
+
+bool DolphinQuery::supportsScheme(const QString& urlScheme)
+{
+    static const QStringList supportedSchemes = {
+        QStringLiteral("baloosearch"),
+    };
+
+    return supportedSchemes.contains(urlScheme);
+}
+
+void DolphinQuery::parseBalooQuery()
+{
+    const Baloo::Query query = Baloo::Query::fromSearchUrl(m_searchUrl);
+
+    m_includeFolder = query.includeFolder();
 
     const QStringList types = query.types();
-    model.m_fileType = types.isEmpty() ? QString() : types.first();
+    m_fileType = types.isEmpty() ? QString() : types.first();
 
     QStringList textParts;
     QString fileName;
@@ -93,33 +113,31 @@ DolphinQuery DolphinQuery::fromBalooSearchUrl(const QUrl& searchUrl)
         if (token == QLatin1String("filename:")) {
             if (!value.isEmpty()) {
                 fileName = value;
-                model.m_hasFileName = true;
+                m_hasFileName = true;
             }
             continue;
         } else if (!token.isEmpty()) {
-            model.m_searchTerms << token + value;
+            m_searchTerms << token + value;
             continue;
         } else if (subTerm == QLatin1String("AND") && subTerm != subTerms.at(0) && subTerm != subTerms.back()) {
             continue;
         } else if (!value.isEmpty()) {
             textParts << value;
-            model.m_hasContentSearch = true;
+            m_hasContentSearch = true;
         }
     }
 
-    if (model.m_hasFileName) {
-        if (model.m_hasContentSearch) {
+    if (m_hasFileName) {
+        if (m_hasContentSearch) {
             textParts << QStringLiteral("filename:\"%1\"").arg(fileName);
         } else {
             textParts << fileName;
         }
     }
 
-    model.m_searchText = textParts.join(QLatin1Char(' '));
-
-#endif
-    return model;
+    m_searchText = textParts.join(QLatin1Char(' '));
 }
+
 
 QUrl DolphinQuery::searchUrl() const
 {
