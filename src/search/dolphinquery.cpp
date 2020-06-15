@@ -27,6 +27,7 @@
 #endif
 
 namespace {
+#ifdef HAVE_BALOO
     /** Checks if a given term in the Baloo::Query::searchString() is a special search term
      * @return: the specific search token of the term, or an empty QString() if none is found
      */
@@ -67,6 +68,7 @@ namespace {
         }
         return textParts;
     }
+#endif
 }
 
 
@@ -76,9 +78,7 @@ DolphinQuery DolphinQuery::fromSearchUrl(const QUrl& searchUrl)
     model.m_searchUrl = searchUrl;
 
     if (searchUrl.scheme() == QLatin1String("baloosearch")) {
-#ifdef HAVE_BALOO
         model.parseBalooQuery();
-#endif
     }
 
     return model;
@@ -95,6 +95,7 @@ bool DolphinQuery::supportsScheme(const QString& urlScheme)
 
 void DolphinQuery::parseBalooQuery()
 {
+#ifdef HAVE_BALOO
     const Baloo::Query query = Baloo::Query::fromSearchUrl(m_searchUrl);
 
     m_includeFolder = query.includeFolder();
@@ -136,6 +137,7 @@ void DolphinQuery::parseBalooQuery()
     }
 
     m_searchText = textParts.join(QLatin1Char(' '));
+#endif
 }
 
 
